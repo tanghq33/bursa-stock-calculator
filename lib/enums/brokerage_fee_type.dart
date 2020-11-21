@@ -1,0 +1,4 @@
+enum BrokerageFeeType {
+  Constant,
+  Variable
+}

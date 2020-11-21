@@ -1,0 +1,65 @@
+name: stockcalculator
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+3
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Community Material Design Icon Pack
+  community_material_icon: ^3.5.95
+
+  # For Dashed Border
+  dotted_border: ^1.0.5
+
+  # For Launcher Icon
+  flutter_launcher_icons: ^0.7.5
+  
+  # For Local Storage
+  shared_preferences: ^0.5.7+3
+
+  # Hive
+  hive: 1.2.0
+  hive_flutter: ^0.3.0+2
+
+  # Get local path
+  path_provider: ^1.6.11
+
+  # Slideable widget for ListView
+  flutter_slidable: "^0.5.4"
+
+  # Rate App
+  store_redirect: ^1.0.2
+
+  # Support App
+  # url_launcher: ^5.5.0
+
+  # Admob
+  admob_flutter: ^0.3.4
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^0.1.3
+
+dependency_overrides:
+  path: ^1.7.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner:
+  hive_generator: ^0.5.0
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/icon.png"
+
+flutter:
+  uses-material-design: true
