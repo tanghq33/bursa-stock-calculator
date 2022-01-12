@@ -37,11 +37,23 @@ class _FavouritePageState extends State<FavouritePage> {
           itemBuilder: (context, index) {
             final favourite = favouriteBox.getAt(index) as Favourite;
             return Slidable(
-              actionPane: SlidableDrawerActionPane(),
-              actionExtentRatio: 0.20,
+              endActionPane: ActionPane(
+                motion: ScrollMotion(),
+                children: [
+                  SlidableAction(
+                    icon: Icons.delete,
+                    label: 'Delete',
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    onPressed: (BuildContext context) {
+                      SnackBarHelper.showSnackBar(context, "${(favouriteBox.getAt(index) as Favourite).name} deleted.");
+                      favouriteBox.deleteAt(index);
+                    },
+                  ),
+                ],
+              ),
               child: Padding(
-                padding:
-                    EdgeInsets.only(left: 25, top: 5, bottom: 5, right: 15),
+                padding: EdgeInsets.only(left: 25, top: 5, bottom: 5, right: 15),
                 child: Row(
                   children: <Widget>[
                     Expanded(
@@ -68,36 +80,20 @@ class _FavouritePageState extends State<FavouritePage> {
                     IconButton(
                       icon: Icon(CommunityMaterialIcons.trending_up),
                       onPressed: () {
-                        FavouriteHelper()
-                            .setFavourite(favourite)
-                            .setTarget(FavouriteTarget.Profit);
+                        FavouriteHelper().setFavourite(favourite).setTarget(FavouriteTarget.Profit);
                         ControllerHelper().getController().animateTo(1);
                       },
                     ),
                     IconButton(
                       icon: Icon(CommunityMaterialIcons.calculator_variant),
                       onPressed: () {
-                        FavouriteHelper()
-                            .setFavourite(favourite)
-                            .setTarget(FavouriteTarget.Price);
+                        FavouriteHelper().setFavourite(favourite).setTarget(FavouriteTarget.Price);
                         ControllerHelper().getController().animateTo(2);
                       },
                     ),
                   ],
                 ),
               ),
-              secondaryActions: <Widget>[
-                IconSlideAction(
-                  caption: 'Delete',
-                  color: Colors.red,
-                  icon: Icons.delete,
-                  onTap: () {
-                    SnackBarHelper.showSnackBar(context,
-                        "${(favouriteBox.getAt(index) as Favourite).name} deleted.");
-                    favouriteBox.deleteAt(index);
-                  },
-                ),
-              ],
             );
           },
           itemCount: favouriteBox.length,

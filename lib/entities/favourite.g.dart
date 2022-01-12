@@ -8,10 +8,13 @@ part of 'favourite.dart';
 
 class FavouriteAdapter extends TypeAdapter<Favourite> {
   @override
+  final int typeId = 0;
+
+  @override
   Favourite read(BinaryReader reader) {
-    var numOfFields = reader.readByte();
-    var fields = <int, dynamic>{
-      for (var i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Favourite(
       name: fields[0] as String,
@@ -34,4 +37,14 @@ class FavouriteAdapter extends TypeAdapter<Favourite> {
       ..writeByte(3)
       ..write(obj.shareQuantity);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FavouriteAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }

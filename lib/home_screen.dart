@@ -38,12 +38,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController =
-        new TabController(vsync: this, length: _pageWidgets.length);
+    _tabController = new TabController(vsync: this, length: _pageWidgets.length);
     ControllerHelper().setController(_tabController);
 
     // _adFree = UserPreferences().getIsAdFree();
-    _adFree = false;
+    _adFree = true;
 
     _isAdDisplayed = true;
 
@@ -75,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Center(
           child: Text(
@@ -130,9 +129,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  _admobBanner == null ? Container() : _admobBanner
-                ],
+                children: <Widget>[_admobBanner == null ? Container() : _admobBanner],
               ),
             ),
           ),

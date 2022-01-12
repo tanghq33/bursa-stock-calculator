@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 
 part 'favourite.g.dart';
 
-@HiveType()
+@HiveType(typeId: 0)
 class Favourite {
   @HiveField(0)
   final String name;
@@ -14,10 +14,5 @@ class Favourite {
   @HiveField(3)
   final int shareQuantity;
 
-  Favourite({
-    @required this.name,
-    @required this.purchasePrice,
-    @required this.shareQuantity,
-    this.sellingPrice
-  });
+  Favourite({@required this.name, @required this.purchasePrice, @required this.shareQuantity, this.sellingPrice});
 }

@@ -16,15 +16,14 @@ void main() async {
   await UserPreferences().init();
 
   // Admob
-  final admobHelper = AdmobHelper();
-  admobHelper.setTestingMode(false);
-  Admob.initialize(admobHelper.getAppId());
+  // final admobHelper = AdmobHelper();
+  // admobHelper.setTestingMode(true);
+  // Admob.initialize(testDeviceIds: [admobHelper.getAppId()]);
 
   // Initialize Hive
-  final appDocumetnDirectory =
-      await path_provider.getApplicationDocumentsDirectory();
+  final appDocumetnDirectory = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumetnDirectory.path);
-  Hive.registerAdapter(FavouriteAdapter(), 0);
+  Hive.registerAdapter(FavouriteAdapter());
 
   runApp(MyApp());
 }
