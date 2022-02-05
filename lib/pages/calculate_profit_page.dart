@@ -57,6 +57,8 @@ class _CalculateProfitPageState extends State<CalculateProfitPage> {
   RegExp _floatValidator;
   RegExp _integerValidator;
 
+  bool _isExcludeSST;
+
   @override
   void dispose() {
     _isViewingFavourite = false;
@@ -77,11 +79,9 @@ class _CalculateProfitPageState extends State<CalculateProfitPage> {
     _purchasePriceController = TextEditingController();
     _purchasePriceClearButtonVisible = _purchasePriceController.text.isNotEmpty;
     _purchasePriceController.addListener(() {
-      if (_purchasePriceClearButtonVisible !=
-          _purchasePriceController.text.isNotEmpty) {
+      if (_purchasePriceClearButtonVisible != _purchasePriceController.text.isNotEmpty) {
         setState(() {
-          _purchasePriceClearButtonVisible =
-              _purchasePriceController.text.isNotEmpty;
+          _purchasePriceClearButtonVisible = _purchasePriceController.text.isNotEmpty;
         });
       }
     });
@@ -89,24 +89,19 @@ class _CalculateProfitPageState extends State<CalculateProfitPage> {
     _shareQuantityController = TextEditingController();
     _shareQuantityClearButtonVisible = _shareQuantityController.text.isNotEmpty;
     _shareQuantityController.addListener(() {
-      if (_shareQuantityClearButtonVisible !=
-          _shareQuantityController.text.isNotEmpty) {
+      if (_shareQuantityClearButtonVisible != _shareQuantityController.text.isNotEmpty) {
         setState(() {
-          _shareQuantityClearButtonVisible =
-              _shareQuantityController.text.isNotEmpty;
+          _shareQuantityClearButtonVisible = _shareQuantityController.text.isNotEmpty;
         });
       }
     });
 
     _sellingPriceController = TextEditingController();
-    _sellingPriceControllerClearButtonVisible =
-        _sellingPriceController.text.isNotEmpty;
+    _sellingPriceControllerClearButtonVisible = _sellingPriceController.text.isNotEmpty;
     _sellingPriceController.addListener(() {
-      if (_sellingPriceControllerClearButtonVisible !=
-          _sellingPriceController.text.isNotEmpty) {
+      if (_sellingPriceControllerClearButtonVisible != _sellingPriceController.text.isNotEmpty) {
         setState(() {
-          _sellingPriceControllerClearButtonVisible =
-              _sellingPriceController.text.isNotEmpty;
+          _sellingPriceControllerClearButtonVisible = _sellingPriceController.text.isNotEmpty;
         });
       }
     });
@@ -154,17 +149,16 @@ class _CalculateProfitPageState extends State<CalculateProfitPage> {
         _isViewingFavourite = true;
         _currentFavourite = favourite;
         FavouriteHelper().clearFavourite();
-        _purchasePriceController.text = favourite.purchasePrice == null
-            ? Strings.empty
-            : favourite.purchasePrice.toString();
-        _sellingPriceController.text = favourite.sellingPrice == null
-            ? Strings.empty
-            : favourite.sellingPrice.toString();
-        _shareQuantityController.text = favourite.shareQuantity == null
-            ? Strings.empty
-            : favourite.shareQuantity.toString();
+        _purchasePriceController.text =
+            favourite.purchasePrice == null ? Strings.empty : favourite.purchasePrice.toString();
+        _sellingPriceController.text =
+            favourite.sellingPrice == null ? Strings.empty : favourite.sellingPrice.toString();
+        _shareQuantityController.text =
+            favourite.shareQuantity == null ? Strings.empty : favourite.shareQuantity.toString();
       }
     }
+
+    _isExcludeSST = UserPreferences().getExcludeSST();
   }
 
   @override
@@ -275,8 +269,7 @@ class _CalculateProfitPageState extends State<CalculateProfitPage> {
                         onChanged: (String newValue) {
                           setState(() {
                             _selectedBroker = newValue;
-                            _accountList =
-                                _brokerHelper.getAccounts(_selectedBroker);
+                            _accountList = _brokerHelper.getAccounts(_selectedBroker);
                           });
                         },
                         items: _brokerList.map((String brokerName) {
@@ -328,6 +321,20 @@ class _CalculateProfitPageState extends State<CalculateProfitPage> {
                     ),
                   ],
                 ),
+                Row(
+                  children: [
+                    Switch(
+                      value: _isExcludeSST,
+                      onChanged: (value) {
+                        setState(() {
+                          _isExcludeSST = value;
+                        });
+                        UserPreferences().setExcludeSST(_isExcludeSST);
+                      },
+                    ),
+                    Text('Exclude Service Tax'),
+                  ],
+                ),
               ],
             ),
           ),
@@ -344,20 +351,22 @@ class _CalculateProfitPageState extends State<CalculateProfitPage> {
                 child: Icon(CommunityMaterialIcons.calculator),
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
-                    UserPreferences().setFavouriteBrokerAccount(
-                        _brokerHelper.getAccountId(_selectedAccount));
+                    UserPreferences().setFavouriteBrokerAccount(_brokerHelper.getAccountId(_selectedAccount));
 
                     PriceResult purchasePrice = CalculateHelper.calculatePrice(
-                        Convert.ToDouble(_purchasePriceController.text),
-                        Convert.ToInt(_shareQuantityController.text),
-                        _selectedAccount);
+                      Convert.ToDouble(_purchasePriceController.text),
+                      Convert.ToInt(_shareQuantityController.text),
+                      _selectedAccount,
+                      _isExcludeSST,
+                    );
                     PriceResult sellingPrice = CalculateHelper.calculatePrice(
-                        Convert.ToDouble(_sellingPriceController.text),
-                        Convert.ToInt(_shareQuantityController.text),
-                        _selectedAccount);
+                      Convert.ToDouble(_sellingPriceController.text),
+                      Convert.ToInt(_shareQuantityController.text),
+                      _selectedAccount,
+                      _isExcludeSST,
+                    );
 
-                    ProfitResult profit = CalculateHelper.calculateProfit(
-                        purchasePrice, sellingPrice);
+                    ProfitResult profit = CalculateHelper.calculateProfit(purchasePrice, sellingPrice);
 
                     Navigator.push(
                       context,
@@ -397,20 +406,16 @@ class _CalculateProfitPageState extends State<CalculateProfitPage> {
   }
 
   void _updateFavouriteData() {
-    int favouriteIndex =
-        (Hive.box('favouriteBox').values.toList()).indexOf(_currentFavourite);
+    int favouriteIndex = (Hive.box('favouriteBox').values.toList()).indexOf(_currentFavourite);
     Favourite newFavourite = Favourite(
       name: _currentFavourite.name,
       purchasePrice: Convert.ToDouble(_purchasePriceController.text),
-      sellingPrice: _sellingPriceController.text.isNotEmpty
-          ? Convert.ToDouble(_sellingPriceController.text)
-          : null,
+      sellingPrice: _sellingPriceController.text.isNotEmpty ? Convert.ToDouble(_sellingPriceController.text) : null,
       shareQuantity: Convert.ToInt(_shareQuantityController.text),
     );
     _currentFavourite = newFavourite;
     Hive.box('favouriteBox').putAt(favouriteIndex, newFavourite);
-    SnackBarHelper.showSnackBar(
-        context, _currentFavourite.name + " has been updated.");
+    SnackBarHelper.showSnackBar(context, _currentFavourite.name + " has been updated.");
   }
 
   _showSaveFavouriteDialog(BuildContext context) {
@@ -443,13 +448,11 @@ class _CalculateProfitPageState extends State<CalculateProfitPage> {
                       _shareQuantityController.text.isNotEmpty) {
                     Favourite favourite = new Favourite(
                       name: controller.text,
-                      purchasePrice:
-                          Convert.ToDouble(_purchasePriceController.text),
+                      purchasePrice: Convert.ToDouble(_purchasePriceController.text),
                       sellingPrice: _sellingPriceController.text.isNotEmpty
                           ? Convert.ToDouble(_sellingPriceController.text)
                           : null,
-                      shareQuantity:
-                          Convert.ToInt(_shareQuantityController.text),
+                      shareQuantity: Convert.ToInt(_shareQuantityController.text),
                     );
 
                     Hive.box('favouriteBox').add(favourite);

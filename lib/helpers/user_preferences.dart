@@ -31,6 +31,14 @@ class UserPreferences {
     _prefs.setBool('compareBrokerIncludeFees', value);
   }
 
+  bool getExcludeSST() {
+    return _prefs.getBool('excludeSST') ?? false;
+  }
+
+  void setExcludeSST(bool value) {
+    _prefs.setBool('excludeSST', value);
+  }
+
   // bool getIsAdFree() {
   //   return _prefs.getBool('adFree') ?? false;
   // }

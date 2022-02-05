@@ -17,6 +17,7 @@ class CalculateHelper {
     double sharePrice,
     int numberOfShares,
     Broker broker,
+    bool excludeSST,
   ) {
     double grossAmount = sharePrice * numberOfShares;
     double clearingFee = _calculateClearingFee(grossAmount);
@@ -55,7 +56,7 @@ class CalculateHelper {
       brokerageFee = broker.minimum;
     }
 
-    serviceTax = _calculateServiceTax(brokerageFee);
+    serviceTax = excludeSST ? 0 : _calculateServiceTax(brokerageFee);
 
     return PriceResult(
       sharePrice: sharePrice,
@@ -120,7 +121,7 @@ class CalculateHelper {
     Map<Broker, PriceResult> compareBrokerResult = new Map<Broker, PriceResult>();
     for (int i = 0; i < brokerList.length; i++) {
       Broker broker = brokerList[i];
-      PriceResult result = calculatePrice(purchasePrice, shareQuantity, broker);
+      PriceResult result = calculatePrice(purchasePrice, shareQuantity, broker, false);
       compareBrokerResult[broker] = result;
     }
     var sortedMap = Map.fromEntries(
